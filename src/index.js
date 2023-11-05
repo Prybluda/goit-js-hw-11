@@ -9,6 +9,8 @@ const btnLoadMore = document.querySelector('.load-more');
 
 let page = 1;
 let per_page = 40;
+let totalPages = 1;
+let searchImg = '';
 
 btnLoadMore.style.display = 'none';
 
@@ -28,13 +30,13 @@ async function getApi(searchImg, page, perPage) {
     }
     
   }
-  getApi()
+  
  
 input.addEventListener('submit', pressSearch);
 
 async function pressSearch(e){
     e.preventDefault();
-    const searchImg = input.value;
+     searchImg = input.value;
     input.value = '';
     page = 1;
     gallery.innerHTML= '';
@@ -43,6 +45,7 @@ async function pressSearch(e){
         const images = data.hits;
         const markup = createMarkup(images);
         gallery.insertAdjacentHTML('beforeend', markup);
+        totalPages = Math.ceil(data.totalHits / per_page);
         if(images.length === 0) {
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         } else if (images.length < per_page){
@@ -81,14 +84,14 @@ async function pressSearch(e){
 
 async function loadMore() {
     page += 1;
-    const searchImg = input.value;
+//    searchImg = input.value;
   
     try {
       const data = await getApi(searchImg, page, per_page);
       const images = data.hits;
       const markup = createMarkup(images);
       gallery.insertAdjacentHTML('beforeend', markup);
-      if (images.length < per_page) {
+      if (page >= totalPages) {
         btnLoadMore.style.display = 'none';
       }
     } catch (error) {
